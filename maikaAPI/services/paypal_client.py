@@ -1,5 +1,5 @@
 """
-Cliente de PayPal para la integración de pagos
+PayPal client fro payment integration
 """
 
 import os
@@ -15,15 +15,15 @@ from paypalserversdk.paypal_serversdk_client import PaypalServersdkClient
 from paypalserversdk.controllers.orders_controller import OrdersController
 from paypalserversdk.controllers.payments_controller import PaymentsController
 
-# Cargar variables de entorno
+# Load environment variables
 load_dotenv()
 
-# Obtener credenciales de PayPal desde variables de entorno
+# Recive PayPal Credentials environment variables
 PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID")
 PAYPAL_CLIENT_SECRET = os.getenv("PAYPAL_CLIENT_SECRET")
 ENVIRONMENT = os.getenv("FLASK_ENV", "development")
 
-# Configuración del cliente PayPal
+# PayPal client configuration
 paypal_client = PaypalServersdkClient(
     client_credentials_auth_credentials=ClientCredentialsAuthCredentials(
         o_auth_client_id=PAYPAL_CLIENT_ID,
@@ -41,7 +41,7 @@ paypal_client = PaypalServersdkClient(
     ),
 )
 
-# Inicializar controladores de PayPal
+# Initialize PayPal controllers
 orders_controller = paypal_client.orders
 payments_controller = paypal_client.payments
 
@@ -73,7 +73,7 @@ class PayPalService:
         from paypalserversdk.api_helper import ApiHelper
 
         try:
-            # Preparar items para PayPal
+            # Prepare intems for paypal
             paypal_items = []
             for dish in order_data.get("dishes", []):
                 paypal_items.append(
@@ -89,10 +89,10 @@ class PayPalService:
                     )
                 )
             
-            # Obtener el total de la orden
+            # Get the order total
             total = order_data.get("total", 0)
             
-            # Crear orden en PayPal
+            # Create order in PayPal
             order_result = orders_controller.create_order(
                 {
                     "body": OrderRequest(
@@ -113,7 +113,7 @@ class PayPalService:
                 }
             )
             
-            # Convertir respuesta a diccionario
+            # Convert response to dictionary
             return ApiHelper.json_deserialize(ApiHelper.json_serialize(order_result.body))
             
         except Exception as e:
@@ -134,12 +134,12 @@ class PayPalService:
         from paypalserversdk.api_helper import ApiHelper
         
         try:
-            # Capturar orden en PayPal
+            # Capture order in PayPal
             capture_result = orders_controller.capture_order(
                 {"id": order_id, "prefer": "return=representation"}
             )
             
-            # Convertir respuesta a diccionario
+            # Convert response to diccionary
             return ApiHelper.json_deserialize(ApiHelper.json_serialize(capture_result.body))
             
         except Exception as e:
@@ -160,10 +160,10 @@ class PayPalService:
         from paypalserversdk.api_helper import ApiHelper
         
         try:
-            # Obtener orden de PayPal
+            # Get PayPal order
             order_result = orders_controller.get_order({"id": order_id})
             
-            # Convertir respuesta a diccionario
+            # Convert response to dictionary
             return ApiHelper.json_deserialize(ApiHelper.json_serialize(order_result.body))
             
         except Exception as e:
